@@ -6,6 +6,8 @@ import cors from 'cors';
 import * as middlewares from './middlewares';
 import api from './api';
 import MessageResponse from './interfaces/MessageResponse';
+import { prisma } from '@db/client';
+
 
 require('dotenv').config();
 
@@ -21,6 +23,23 @@ app.get<{}, MessageResponse>('/', (req, res) => {
     message: '🦄🌈✨👋🌎🌍🌏✨🌈🦄',
   });
 });
+
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    uptime: process.uptime(),
+    message: 'OK',
+    timestamp: new Date(),
+  });
+});
+
+app.get('/users', async(req, res) => {
+  const users = await prisma.user.findMany()
+  res.status(200).json({
+    status: 'ok',
+    users,
+  });
+})
 
 app.use('/api/v1', api);
 
